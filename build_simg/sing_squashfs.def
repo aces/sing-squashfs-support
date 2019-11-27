@@ -1,0 +1,15 @@
+
+Bootstrap: library
+From: centos:7
+
+%post
+    yum upgrade -y
+    yum install -y rsync
+    yum install -y openssh-server
+
+%labels
+    Author pierre.rioux@mcgill.ca
+    Version v1.0.1
+
+%help
+    This container provides the a basic CENTOS 7 system with rsync and sftp server (from openssh)
