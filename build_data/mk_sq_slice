@@ -1,0 +1,116 @@
+#!/bin/bash
+
+# This wrapper will run the mkquashfs program, packing the content of
+# some directories under a new path in the squashfs file.
+
+VERSION="1.0"
+BASENAME=$(basename $0)
+
+function usage() {
+  cat <<USAGE
+This is $BASENAME $VERSION By Pierre Rioux
+
+Usage:
+
+$0 to_create.squashfs /path/inside/sqfs source [source...]
+
+where:
+
+  to_create.squashfs
+
+    is the name of a new squashfs filesystem file that will be created
+    by the program. If it already exists, the program will refuse to
+    proceed and stop immediately.
+
+  /path/inside/sqf
+
+    is an arbitrary full path where you want the data to be moved into
+    within the new squashfs filesystem (see example below)
+
+  source [...]
+
+    is one or several source directories that will be put into the
+    new squashfs filesystem. Note that ONLY THEIR BASENAMES will be
+    used in the fileystem. They can be full or relative paths
+    All the basenames of the source arguments will end up under
+    the specifed /path/inside/sqfs/ .
+
+The mksquashfs command that is invoked during the creation of the
+filesystem use all the default options. It you want to override any
+of them, provide them in the environment variable \$MKSQUASHOPTIONS
+as a single string.
+
+Examples:
+
+$0 abc.sqfs /data/super data/001 data/002 /other/data/003
+
+will create a squashfs filesystem with, in it:
+
+    /data/super/001
+    /data/super/002
+    /data/super/003
+
+To customize options:
+
+MKSQUASHOPTIONS="-noI -no-progress -processors 1" $0 abc.sqfs / data/*
+
+USAGE
+  exit 2
+}
+
+function banner() {
+  echo ""
+  echo "============================================"
+  echo "$@"
+  echo "============================================"
+  echo ""
+}
+
+
+
+######################################################################
+# Command line arguments
+######################################################################
+
+test $# -lt 3 && usage
+
+NEWSQ="$1"
+DATA_PATH="$2"
+shift ; shift
+
+if test -e "$NEWSQ" ; then
+  echo "Error: file $NEWSQ already exists." 1>&2
+  exit 2
+fi
+
+if test "X${DATA_PATH:0:1}" != "X/" ; then
+  echo "Path inside the SquashFS file must be a full path." 1>&2
+  exit 2
+fi
+
+
+######################################################################
+# Main filesystem build
+######################################################################
+
+banner "Building Main Filesystem in $NEWSQ"
+mksquashfs "$@" $NEWSQ $MKSQUASHOPTIONS || exit
+
+
+
+######################################################################
+# Re-rooting the data
+######################################################################
+EMPTY="/tmp/$BASENAME.$$.empty"
+mkdir $EMPTY || exit
+
+# Re-root everything
+banner "Moving all data under $DATA_PATH"
+while test "X$(basename $DATA_PATH)" != "X/" ; do
+  last=$(basename $DATA_PATH)
+  DATA_PATH=$(dirname $DATA_PATH)
+  echo "-> Moving all under '/$last'"
+  mksquashfs $EMPTY $NEWSQ -root-becomes $last $MKSQUASHOPTIONS -no-progress -processors 1 >/dev/null || exit
+done
+
+rmdir $EMPTY
