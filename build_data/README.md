@@ -53,7 +53,7 @@ within the new filesystem. This command would do the trick:
 mk_sq_slice mynewfs.sqs /newroot /data/large/*
 ```
 
-Invoke `mk_sq_slice -h` to get an explanation of its options and arguments.
+Run `mk_sq_slice -h` to get an explanation of its options and arguments.
 
 ### b) When the total size is large
 
@@ -81,4 +81,16 @@ and it will run the command `mk_sq_slice` for you.
 ```
 mk_sq_all supdata /newroot /data/large 150
 ```
+
+This produces seven squashfs filesystem files:
+
+* supdata_00.squashfs (containing data 000 to 149)
+* supdata_01.squashfs (containing data 150 to 299)
+* supdata_02.squashfs (containing data 300 to 449)
+* supdata_03.squashfs (containing data 450 to 599)
+* supdata_04.squashfs (containing data 600 to 749)
+* supdata_05.squashfs (containing data 750 to 899)
+* supdata_06.squashfs (containing data 900 to 999)
+
+Run `mk_sq_all -h` to get more information about this program.
 
