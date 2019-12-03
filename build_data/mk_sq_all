@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# This wrapper will run the mk_sq_slice program several times
+# in order to create several squashfs filesystems representing
+# a set of subdirectories.
+
+VERSION="1.0"
+BASENAME=$(basename $0)
+
+function usage() {
+  cat <<USAGE
+This is $BASENAME $VERSION By Pierre Rioux
+
+This program will pack the content of a directory containing
+many other data subdirectories into a set of squashfs filesystem
+files. It is a wrapper script that invokes the program 'mk_sq_slice'
+several times.
+
+Usage:
+
+$0 prefix_name /path/inside/sqfs source_dir num_subdirs_per_sqfs
+
+where:
+
+  prefix_name
+
+    is part of the name of the new squashfs filesystem files that
+    will be created by the program. The real names will be created as
+    "{prefix_name}_00.squashfs", "{prefix_name}_01.squashfs" etc.
+
+  /path/inside/sqf
+
+    is an arbitrary full path where you want the data to be moved into
+    within the new squashfs filesystem (see example below).
+
+  source_dir
+
+    is one directory containing a bunch of other large data
+    subdirectories.
+
+  num_subdirs_per_sqfs
+
+    is a number and indicate how many of the subdirectories of
+    source_dir will be packed into each new squashfs filesystem
+
+The mksquashfs command that is invoked (through mk_sq_slice)
+during the creation of the filesystem use all the default options. It you
+want to override any of them, provide them in the environment variable
+\$MKSQUASHOPTIONS as a single string.
+
+Examples:
+
+$0 abc /new/root /big/data 20
+
+Assuming /big/data contains 40 files named 00 to 39, it will create
+two squashfs files:
+
+abc_00.squashfs with, in it:
+
+    /new/root/00
+    /new/root/01
+    ..
+    /new/root/19
+
+and abc_01.squashfs with, in it:
+
+    /new/root/20
+    /new/root/21
+    ..
+    /new/root/19
+
+To customize the SquashFS options:
+
+MKSQUASHOPTIONS="-noI -no-progress -processors 1" $0 abc /new/root /big/data 20
+
+USAGE
+  exit 2
+}
+
+function banner() {
+  echo ""
+  echo "###############################################################"
+  echo "$BASENAME: $@"
+  echo "###############################################################"
+  echo ""
+}
+
+
+
+######################################################################
+# Command line arguments
+######################################################################
+
+test $# -ne 4 && usage
+
+# Arguments
+NEWSQ="$1"
+REROOT_PATH="$2"
+SRC_PATH="$3"
+SLICE_SIZE="$4"
+
+if test "X${REROOT_PATH:0:1}" != "X/" ; then
+  echo "Path inside the SquashFS files must be a full path." 1>&2
+  exit 2
+fi
+
+if ! test -d "$SRC_PATH" ; then
+  echo "Source of data is not a directory."
+  exit 2
+fi
+
+clean_slice=$(echo $SLICE_SIZE | tr -c -d 0-9)
+if test "X$clean_slice" != "X$SLICE_SIZE" ; then
+  echo "The final argument must be an integer."
+  exit 2
+fi
+
+######################################################################
+# Main Slicing
+######################################################################
+
+count=0
+/bin/ls -1d $SRC_PATH/*     | \
+  xargs -n $SLICE_SIZE echo | \
+  while builtin read subset ; do
+    prettycount=$(printf "%2.2d" $count)
+    filename="${NEWSQ}_${prettycount}.squashfs"
+    count=$(( $count + 1 ))
+    banner "Creating $filename"
+    if test -f $filename ; then
+      echo "Already exists: skipping."
+      continue
+    fi
+    mk_sq_slice $filename $REROOT_PATH $subset || exit 20
+  done
+
