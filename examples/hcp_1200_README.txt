@@ -93,11 +93,24 @@ a great organization for large production clusters. And finally, our lab's
 quota is very much restricted in the number of files we can have, so it
 would simply not be possible to have the dataset as normal files anyway.
 
-8) Who do I contact to complain?
+8) Are there other ways to access the data files?
+
+Of course! The website https://github.com/aces/sing-squashfs-support
+contains hints and tips. Through the use of utility commands that
+happen to be installed here too, you can:
+
+   a) mount the files using sshfs (sing_sftpd_here)
+   b) rsync the content out of there (sing_rsync_here)
+   c) run a command in an easier way than described above (sing_command_here)
+
+Just don't rsync the entire dataset out, it's nonsensical and
+you don't have the room anyway!
+
+9) Who do I contact to complain?
 
 Shawn T Brown, my manager.
 
-9) Who do I contact to give praise?
+10) Who do I contact to give praise?
 
 Pierre Rioux, with Cc to Shawn T Brown.
 

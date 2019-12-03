@@ -7,9 +7,20 @@
 #
 # The site above gives examples on how to invoke this script as a wrapper for
 #
-#     a) mounting squashfs files using sshfs;
-#     b) running rsync inside a container with squashfs files;
-#     c) running any other command too while we're at it.
+# a) mounting squashfs files using sshfs;
+# b) running rsync inside a container with squashfs files;
+# c) running any other command too while we're at it.
+#
+# This program has many capabilities that are triggered
+# automatically by how it is NAMED at installation. If it
+# is called any of these names, some default behaviors will
+# be triggered:
+#
+#  sing_sftpd   # passthrough container command: sftp-server
+#  sing_rsync   # passthrough container command: rsync
+#  sing_command_here # default sqfs and image: in install dir
+#  sing_sftpd_here   # default sqfs and image: in install dir
+#  sing_rsync_here   # default sqfs and image: in install dir
 
 VERSION="3.0"
 BASENAME=$(basename $0)
@@ -91,7 +102,7 @@ where:
 Installation shortcut:
 
   If this program is installed in a directory and renamed with
-  a '_here' at the end of the name, it will automtically internally
+  a '_here' at the end of the name, it will automatically internally
   assume that a '-D' option was provided with the path to the directory
   where the script is installed as argument. E.g.
 
