@@ -74,7 +74,7 @@ where:
     no singularity_image_file and no overlay_file_pattern), then the program
     will pick the first file named "*.simg" in the directory as its
     singularity image file, and will pick all files ending in .squashfs,
-    .sqs or .ext4 as the overlays.
+    .sqs or .ext3 as the overlays.
 
   -I singularity_image_file
 
@@ -125,7 +125,7 @@ Examples:
 
  # Using a -D and no other arguments:
  # a) singularity image will be first .simg
- # b) overlays will be all .squashfs, .sqs or .ext4 files
+ # b) overlays will be all .squashfs, .sqs or .ext3 files
  sing_sftpd -D /my/path/for/everything
 
 USAGE
@@ -192,7 +192,7 @@ if test -n "$PREFIX" ; then
 
   # Auto find overlays
   if test -z "$OVERLAYS" ; then
-    OVERLAYS=$(ls -1 | egrep '\.squashfs$|\.sqs$|\.ext4$')
+    OVERLAYS=$(ls -1 | egrep '\.squashfs$|\.sqs$|\.ext3$')
   fi
 
 fi
