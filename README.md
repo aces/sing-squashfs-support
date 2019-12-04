@@ -135,8 +135,8 @@ The first thing to realize is that we can't simply use a normal
 sshfs mount command, because the container is not initially started.
 Even if the container is started, it:
 
-i) doesn't run a sshd deamon;
-ii) it is not even addressable with a network address
+* doesn't run a sshd deamon;
+* it is not even addressable with a network address.
 
 In [Diagram #2](images/diag_02_SSHFS.png) we can see that a normal
 sshfs mount results in the program `sftp-server` to be launched on
@@ -147,7 +147,7 @@ translated into SFTP operations sent through the ssh connection to
 that remote `sftp-server` program.
 
 What we need to do is tell the sshfs mounter to launch, on the
-remote site, its client `sftp-server` inside the container. It will
+remote site, its client `sftp-server` **inside** the container. It will
 run as a standalone normal process, even though it will still talk
 to its launcher sshd program through stdin and stdout. A very
 complicated way of doing this would be to mount the filesystem with:
@@ -173,7 +173,7 @@ OpenSSH package.
 
 A better way of performing the same thing without having to provide
 a long command to the `-o sftp_server=` option is to first pack
-that long command into a separate bash script, let's call it
+that long command into a separate bash script. Let's call it
 `example1.sh` :
 
 ```bash
@@ -201,7 +201,7 @@ This will work fine as long as the content of `example1.sh` is
 updated appropriately whenever the singularity container is changed,
 or the set of overlays are changed.
 
-A more generic solution would be to create a new shell wrapper that
+A better solution would be to create a new shell wrapper that
 works like `example1.sh` but in a more generic way. The [bin](bin)
 directory in this repo contains such programs, `sing_sftpd` and
 `sing_sftpd_here`.  They come with full documentation, just run
@@ -216,7 +216,7 @@ sshfs -o sftp_server="/data/HCPsquash/sing_sftpd_here" user@computer2:/HCP_1200_
 
 ### e) Extracting data using rsync
 
-Just like for sshfs in section d) above, if we can't simply rsync
+Just like for sshfs in section d) above, we can't simply rsync
 the data files out of the `.squashfs` files from the outside if the
 rsync program runs on the host where these squashfs files reside.
 [Diagram #5](images/diag_05_RSYNC.png) shows the architecture of a
@@ -257,7 +257,7 @@ and `sing_rsync_here`. These can be deployed alongside the `.squashfs`
 filesystem files and the singularity image to make the process of
 recognizing them and booting the singularity container transparent.
 Running `sing_rsync` with the `-h` option will provide more
-information.
+information about these utilties.
 
 ## Other tricks and tips
 
@@ -268,10 +268,10 @@ are perfect for large static datasets, as they are very fast and
 reduce tremendously the inode requirements on the host filesystem.
 
 While a process is running inside a singularity container, that
-process can normallt write files only on externally mounted writable
+process can write files only on externally mounted writable
 filesystems; singularity normally provides /tmp and the $HOME
 directory of the user who runs the singularity command. Other mount
-point can be provided by adding explicit -B options to the singularity
+point can be provided by adding explicit `-B` options to the singularity
 command line too.
 
 The utility programs included in [bin](bin) will launch singularity
