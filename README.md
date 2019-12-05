@@ -72,7 +72,7 @@ To connect with all .squashfs file, no matter how many:
 singularity shell $(ls -1 | grep '\.squashfs$' | sed -e 's/^/--overlay /') sing_squashfs.simg
 ```
 
-To disable the messages about the squashfs not being a writabel
+To disable the messages about the squashfs not being a writable
 filesystem, use the `-s` option of singularity:
 
 ```bash

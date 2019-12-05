@@ -24,3 +24,6 @@ This command (run as root) will build the container in the file `sing_squashfs.s
 singularity build sing_squashfs.simg sing_squashfs.def
 ```
 
+Note that singularity doesn't care all that much about the extension given
+to the image file, so you can also call it with `.img` or `.sif` instead of `.simg`.
+

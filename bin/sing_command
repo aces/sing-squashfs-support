@@ -70,11 +70,12 @@ where:
     and overlay_file_pattern. If provided, the program will chdir there
     first before attempting to resolve the other arguments.
 
-    If a directory is given and no other arguments are provided (that is,
-    no singularity_image_file and no overlay_file_pattern), then the program
-    will pick the first file named "*.simg" in the directory as its
-    singularity image file, and will pick all files ending in .squashfs,
-    .sqs or .ext3 as the overlays.
+    If a directory is given and no other arguments are provided
+    (that is, no singularity_image_file and no overlay_file_pattern),
+    then the program will pick the first file named "*.simg" (or
+    "*.sif") in the directory as its singularity image file, and
+    will pick all files ending in .squashfs, .sqs or .ext3 as the
+    overlays.
 
   -I singularity_image_file
 
@@ -124,7 +125,7 @@ Examples:
  sing_sftpd -D /my/path -I /some/other/place/centos.simg -O '*.squashfs'
 
  # Using a -D and no other arguments:
- # a) singularity image will be first .simg
+ # a) singularity image will be first .simg (or .sif)
  # b) overlays will be all .squashfs, .sqs or .ext3 files
  sing_sftpd -D /my/path/for/everything
 
@@ -183,9 +184,9 @@ if test -n "$PREFIX" ; then
 
   # Auto find image
   if test -z "$SING_IMAGE" ; then # if no image given, find one
-    SING_IMAGE=$(ls -1 | grep '\.simg$' | head -1)
+    SING_IMAGE=$(ls -1 | egrep '\.simg$|\.sif$' | head -1)
     if test -z "$SING_IMAGE" ; then
-      echo "Error: can't find a .simg image in directory '$PREFIX'." 1>&2
+      echo "Error: can't find a .simg or .sif image in directory '$PREFIX'." 1>&2
       exit 2
     fi
   fi
