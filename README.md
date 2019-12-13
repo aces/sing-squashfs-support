@@ -279,5 +279,5 @@ containers with not only all the `.squashfs` that they can find,
 but also any file with a `.ext3` extension. These can be built as
 formatted EXT3 filesystem and singularity will make them writable.
 For more information about building such files, consult the repo
-for the utility [withoverlays](https://github.com/prioux/withoverlays).
+for the utility [withoverlays](https://github.com/prioux/withoverlay).
 
