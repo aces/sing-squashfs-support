@@ -214,7 +214,23 @@ mount the data files with:
 sshfs -o sftp_server="/data/HCPsquash/sing_sftpd_here" user@computer2:/HCP_1200_data mymountpoint
 ```
 
-### e) Extracting data using rsync
+### e) Copying the data files using scp
+
+Just like for sshfs above, it is possible to run the scp command's
+server-side program with an alternative SFTP server. The option
+is in fact exactly the same:
+
+```bash
+scp -o sftp_server="singularity -s exec --overlay=/data/HCPsquash/hcp1200-00-100206-103414.squashfs /data/HCPsquash/sing_squashfs.simg /usr/libexec/openssh/sftp-server" user@computer2:/HCP_1200_data/remote_file.txt localfile.txt
+```
+
+or more simply using the same type of wrapper described for sshfs:
+
+```bash
+sshfs -o sftp_server="/data/HCPsquash/sing_sftpd_here" user@computer2:/HCP_1200_data/remote_file.txt localfile.txt
+```
+
+### f) Extracting data using rsync
 
 Just like for sshfs in section d) above, we can't simply rsync
 the data files out of the `.squashfs` files from the outside if the
