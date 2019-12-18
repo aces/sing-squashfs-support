@@ -1,7 +1,7 @@
 
 # How to build a set of .squashfs files to store a large set of data files.
 
-This document provides hints and tips on creating a or several
+This document provides hints and tips on creating one or several
 SquashFS filesystems to hold static data files.
 
 ## Prerequisites & Assumptions
@@ -9,7 +9,7 @@ SquashFS filesystems to hold static data files.
 The core unix utility to create squashfs filesystems is called
 `mksquashfs`.  It comes from the `squashfs-tools` package.
 
-None of the operations described below requires root access.
+None of the operations described below require root access.
 
 We will assume we are trying to package a large directory structure.
 As a general model, let us say it is stored under the path `/data/large`
@@ -24,7 +24,7 @@ exist, named like this:
 ...
 ```
 
-Of course they can ben named anything else, the procedure below
+Of course they can be named anything else, the procedure below
 works just as well.
 
 ## Figuring out how to pack things
@@ -38,11 +38,11 @@ du -h -s -c *
 ```
 
 You will get a size for each of them, and a total size report at
-then end.
+the end.
 
 ### a) When the total size is small
 
-If the total amount of data is less that a terabyte, there's probably
+If the total amount of data is less than a terabyte, there's probably
 no point in trying to split it into several squashfs filesystems;
 just build a single large one and you'll be on your way. The utility
 called `mk_sq_slice` in this directory will do it for you and even
@@ -76,7 +76,8 @@ The utility command `mk_sq_all` will perform this operation for
 you. You give it a prefix for your squashfs files, the path to
 the container directory for all the data subdirectories, and
 the number of data subdirectories you want in each filesystem,
-and it will run the command `mk_sq_slice` for you.
+and it will run the command `mk_sq_slice` for you as often as needed
+to create the needed squashfs filesystems.
 
 ```
 mk_sq_all supdata /newroot /data/large 150
