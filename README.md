@@ -16,7 +16,7 @@ The data organization addressed here generally consists of
 * The directory `build_data` contains code and instructions to make squashfs files;
 * The directory `build_simg` contains code and instructions to build a singularity container;
 * The directory `bin` contain some utility scripts (e.g. `sing_sftpd`);
-* The directory `examples` contains sample README files to install with your data, for helping users access it;
+* The directory `doc_examples` contains sample README files to install with your data, for helping users access it;
 * The directory `images` contains a PDF of technical diagrams, and its source in OmniGraffle format;
 * The rest of this README here contains hints and code snippets on accessing the data files.
 
@@ -36,7 +36,7 @@ total 83068518941
 
 (This example is taken as a subset of a real dataset, and more
 information about it can be found by reading the file
-[README.txt](examples/hcp_1200_README.txt) that was provided to its
+[README.txt](doc_examples/hcp_1200_README.txt) that was provided to its
 users)
 
 The two squashfs files store a bunch of data files inside them under
