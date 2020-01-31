@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # By Pierre Rioux, pierre.rioux@mcgill.ca,
-# November 2019, December 2019.
+# November 2019, December 2019, January 2020
 #
 # See https://github.com/aces/sing-squashfs-support
 #
@@ -217,23 +217,37 @@ fi
 # Note that this is a place where errors can occur silently:
 # if the user provide bad patterns that do not match any files, the
 # pattern will be ignored.
-SING_OVERLAYS=$(ls -1 $OVERLAYS | sed -e 's/^/--overlay=/')
+SING_OVERLAYS=$(ls -1 $OVERLAYS | sed -e 's/^/--overlay=/' -e 's/\.sqs$/.sqs:ro/' -e 's/\.squashfs/.squashfs:ro/')
 
 # Figure out what program to run now;
 # if this script is provided with a command, we run that;
 # if this script is named "sing_sftpd", we run the OpenSSH sftp-server;
 # if this script is named "sing_rsync", we run the rsync command.
+# if this script is named "sing_shell", we start an interactive shell with no command.
 COMMAND=""
+MODE="exec"
 if echo $BASENAME | grep sing_sftpd >/dev/null ; then
   COMMAND="$SFTPD_COMMAND"
 elif echo $BASENAME | grep sing_rsync >/dev/null ; then
   COMMAND="$RSYNC_COMMAND"
+elif echo $BASENAME | grep sing_shell >/dev/null ; then
+  MODE="shell"
 fi
 
-if test -z "$COMMAND" && test -z "$*" ; then
-  echo "Error: we do not know what command to run in the container." 1>&2
-  echo "Try \"$0 -h\" for help" 1>&2
-  exit 2
+if test "$MODE" = "exec" ; then
+  if test -z "$COMMAND" && test -z "$*" ; then
+    echo "Error: we do not know what command to run in the container." 1>&2
+    echo "Try \"$0 -h\" for help" 1>&2
+    exit 2
+  fi
+fi
+
+if test "$MODE" = "shell" ; then
+  if test -n "$COMMAND" || test -n "$*" ; then
+    echo "Error: when starting an interactive shell, no commands are allowed." 1>&2
+    echo "Try \"$0 -h\" for help" 1>&2
+    exit 2
+  fi
 fi
 
 if test "X$*" = "X-h" -o "X$*" = "X-help" -o "X$*" = "X--help" ; then
@@ -241,14 +255,20 @@ if test "X$*" = "X-h" -o "X$*" = "X-help" -o "X$*" = "X--help" ; then
   exit 2
 fi
 
-# OK do the main work now.
-#
-# I use two 'exec's to simplify the process hierarchy!
-#
-# How glorious!
-exec singularity -s exec \
-  $SING_OVERLAYS         \
-  $SING_IMAGE            \
-  bash -c "exec $COMMAND $*"
+if test $MODE = "exec" ; then
+  # OK do the main work now.
+  #
+  # I use two 'exec's to simplify the process hierarchy!
+  #
+  # How glorious!
+  exec singularity -s exec \
+    $SING_OVERLAYS         \
+    $SING_IMAGE            \
+    bash -c "exec $COMMAND $*"
+else # interactive shell
+  exec singularity -s shell \
+    $SING_OVERLAYS          \
+    $SING_IMAGE
+fi
 
 # If bash reaches this point, something is clearly wrong.

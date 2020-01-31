@@ -44,6 +44,11 @@ the root path `/HCP_1200_data`. The first file contains 20
 subdirectories named `100206` ... `103414`, and the second file
 contains 20 subdirectories named `103515` ... `108020`.
 
+**Important note** Singularity versions 3.5.0 to 3.5.2 are known to
+require a suffix consisting of the three characters ':ro' after the
+names of the overlays; the commands below would, for instance,
+require options in the form of `--overlay=abc.squashfs:ro` .
+
 ### a) Connecting interactively (low-level, directly)
 
 This will allow you to have a look at the files, with only the first
@@ -88,7 +93,7 @@ we run `singularity exec`:
 singularity -s exec --overlay=hcp1200-00-100206-103414.squashfs sing_squashfs.simg ls -l /HCP_1200_data
 ```
 
-### c) Running a command (with utility wrapper)
+### c) Running a command or a shell (with utility wrapper)
 
 In the [bin](bin) directory of this repo, you will find a set of
 utility wrapper scripts. In fact, it's a single script with multiple
@@ -118,6 +123,10 @@ but in a simpler way:
 
 # Run on just one squashfs file:
 ./sing_command_here -O hcp1200-00-100206-103414.squashfs ls -l /HCP_1200_data
+
+# Connect interactively:
+./sing_shell_here -O hcp1200-00-100206-103414.squashfs # with one data file
+./sing_shell_here                                      # with all files
 ```
 
 ### d) Mounting the data files using sshfs
