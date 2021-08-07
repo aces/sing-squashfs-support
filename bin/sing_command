@@ -264,7 +264,7 @@ if test $MODE = "exec" ; then
   exec singularity -s exec \
     $SING_OVERLAYS         \
     $SING_IMAGE            \
-    bash -c "exec $COMMAND $*"
+    bash -c "exec $COMMAND $@"
 else # interactive shell
   exec singularity -s shell \
     $SING_OVERLAYS          \
