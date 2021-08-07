@@ -22,7 +22,7 @@
 #  sing_sftpd_here   # default sqfs and image: in install dir
 #  sing_rsync_here   # default sqfs and image: in install dir
 
-VERSION="3.0"
+VERSION="3.1"
 BASENAME=$(basename $0)
 PREFIX="" # -D option
 
@@ -51,6 +51,7 @@ RSYNC_COMMAND="rsync" # hopefully it's in the search path in the container
 
 # Documentation and usage statement
 function usage() {
+  local rc=${1:-2}  # ability to exit with a different code if provided
   cat <<USAGE 1>&2
 This is $BASENAME $VERSION by Pierre Rioux
 
@@ -59,8 +60,6 @@ with a set of overlays. By default, depending on the name of this
 program, it will run the OpenSSH 'sftp-server', or the 'rsync' command.
 
 Usage: $BASENAME [-D directory] [-I singularity_image_file] [-O overlay_file_pattern] [command...]
-
-Note: options must be provided in the order shown!
 
 where:
 
@@ -130,7 +129,7 @@ Examples:
  sing_sftpd -D /my/path/for/everything
 
 USAGE
-  exit 2
+  exit $rc
 }
 
 ##########################################
@@ -143,36 +142,42 @@ if test "X${BASENAME/*_here/Y}" = "XY" ; then
   PREFIX=$(dirname $(readlink -e "$0")) || exit
 fi
 
-####################################
-# Validation of arguments
-####################################
+#####################################
+# Parsing and validation of arguments
+#####################################
 
 if test -z "$PREFIX" -a $# -lt 2 ; then
   usage
 fi
 
-# Optional PREFIX in -D
-if test "X$1" = "X-D" ; then
-  PREFIX="$2"
-  shift ; shift
-  if ! test -d "$PREFIX" ; then
-    echo "Error: '$PREFIX' for option -D is not a directory." 1>&2
-    exit 2
-  fi
-fi
+SING_IMAGE="" # can be empty string if -D provided
+OVERLAYS=""   # can also be empty if -D provided
+while test -n "$1" ; do
+  case "$1" in
+    -D)
+      test $# -lt 2 && usage
+      PREFIX="$2"
+      shift ; shift ;;
+    -I)
+      test $# -lt 2 && usage
+      SING_IMAGE="$2"
+      shift ; shift ;;
+    -O)
+      test $# -lt 2 && usage
+      OVERLAYS="$2"
+      shift ; shift ;;
+    -h | -help | --help)
+      usage 0
+    *)
+      # Must be command and/or arguments, leave as is
+      break ;;
+  esac
+done
 
-# Option -I: the path of the singularity image
-if test "X$1" = "X-I" ; then
-  test $# -lt 2 && usage
-  SING_IMAGE="$2" # can be empty string if -D provided
-  shift ; shift
-fi
-
-# Option -O: the path (or pattern) for one or several overlay images
-if test "X$1" = "X-O" ; then
-  test $# -lt 2 && usage
-  OVERLAYS="$2";  # can also be empty if -D provided
-  shift ; shift
+# Sanity check for optional PREFIX in -D
+if ! test -d "$PREFIX" ; then
+  echo "Error: '$PREFIX' for option -D is not a directory." 1>&2
+  exit 2
 fi
 
 # Find image and overlays if necessary
@@ -248,11 +253,6 @@ if test "$MODE" = "shell" ; then
     echo "Try \"$0 -h\" for help" 1>&2
     exit 2
   fi
-fi
-
-if test "X$*" = "X-h" -o "X$*" = "X-help" -o "X$*" = "X--help" ; then
-  usage
-  exit 2
 fi
 
 if test $MODE = "exec" ; then
