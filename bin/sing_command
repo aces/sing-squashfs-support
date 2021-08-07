@@ -209,7 +209,7 @@ fi
 # Validate overlays patterns
 if test -z "$OVERLAYS" ; then
   echo "Error: no patterns for the overlays files provided." 1>&2
-  echo "Maybe you need to provide the path with -O ?"        1>&2
+  echo "Maybe you need to provide the pattern with -O ?"        1>&2
   exit 2
 fi
 
