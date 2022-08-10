@@ -234,6 +234,13 @@ elif echo $BASENAME | grep sing_shell >/dev/null ; then
   MODE="shell"
 fi
 
+# Help messages
+if test "X$*" = "X-h" -o "X$*" = "X-help" -o "X$*" = "X--help" ; then
+  usage
+  exit 2
+fi
+
+# EXEC requires a command
 if test "$MODE" = "exec" ; then
   if test -z "$COMMAND" && test -z "$*" ; then
     echo "Error: we do not know what command to run in the container." 1>&2
@@ -242,17 +249,13 @@ if test "$MODE" = "exec" ; then
   fi
 fi
 
+# SHELL requires no commands
 if test "$MODE" = "shell" ; then
   if test -n "$COMMAND" || test -n "$*" ; then
     echo "Error: when starting an interactive shell, no commands are allowed." 1>&2
     echo "Try \"$0 -h\" for help" 1>&2
     exit 2
   fi
-fi
-
-if test "X$*" = "X-h" -o "X$*" = "X-help" -o "X$*" = "X--help" ; then
-  usage
-  exit 2
 fi
 
 if test $MODE = "exec" ; then
