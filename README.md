@@ -236,7 +236,7 @@ scp -o sftp_server="singularity -s exec --overlay=/data/HCPsquash/hcp1200-00-100
 or more simply using the same type of wrapper described for sshfs:
 
 ```bash
-sshfs -o sftp_server="/data/HCPsquash/sing_sftpd_here" user@computer2:/HCP_1200_data/remote_file.txt localfile.txt
+scp -o sftp_server="/data/HCPsquash/sing_sftpd_here" user@computer2:/HCP_1200_data/remote_file.txt localfile.txt
 ```
 
 ### f) Extracting data using rsync
