@@ -1,4 +1,10 @@
 
+# Important note, October 2023!
+
+Although still valid, the utilities and documentation in this
+repository have been updated to refer to `Apptainer` in a brand new
+repository, [apptainer-squashfs-support](https://github.com/aces/apptainer-squashfs-support).
+
 # SquashFS through Singularity : Hints And Tips
 
 This repository contains code, examples, hints and other documentation
